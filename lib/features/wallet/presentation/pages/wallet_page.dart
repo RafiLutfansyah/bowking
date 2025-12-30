@@ -39,7 +39,7 @@ class _WalletPageState extends State<WalletPage> with SingleTickerProviderStateM
   void _loadInitialData() {
     final userId = context.read<CurrentUserCubit>().currentUser?.id ?? '';
     context.read<WalletBloc>().add(LoadWallet(userId));
-    context.read<WalletBloc>().add(LoadTransactionHistory(userId, forceRefresh: true));
+    context.read<WalletBloc>().add(LoadTransactionHistory(userId));
   }
 
   @override
@@ -217,7 +217,7 @@ class _WalletPageState extends State<WalletPage> with SingleTickerProviderStateM
           return RefreshIndicator(
             onRefresh: () async {
               final userId = context.read<CurrentUserCubit>().currentUser?.id ?? '';
-              context.read<WalletBloc>().add(LoadTransactionHistory(userId, forceRefresh: true));
+              context.read<WalletBloc>().add(LoadTransactionHistory(userId));
               await Future.delayed(const Duration(milliseconds: 500));
             },
             child: _buildTransactionsList(state.transactions!),

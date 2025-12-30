@@ -24,9 +24,8 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
     LoadWallet event,
     Emitter<WalletState> emit,
   ) async {
-    // Skip if already loading or data is fresh
+    // Skip if already loading
     if (state.isBalanceLoading) return;
-    if (state.wallet != null && !event.forceRefresh) return;
     
     emit(state.copyWith(isBalanceLoading: true, clearBalanceError: true));
     final result = await getWallet(event.userId);
@@ -71,11 +70,6 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
   ) async {
     // Skip if already loading
     if (state.isTransactionsLoading) return;
-    
-    // Only skip if we have fresh data AND not forcing refresh
-    if (state.transactions != null && 
-        state.transactions!.isNotEmpty && 
-        !event.forceRefresh) return;
     
     print('=== BLOC: Loading transactions for user: ${event.userId} ===');
     emit(state.copyWith(isTransactionsLoading: true, clearTransactionsError: true));

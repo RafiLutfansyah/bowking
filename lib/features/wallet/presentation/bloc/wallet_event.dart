@@ -9,12 +9,11 @@ abstract class WalletEvent extends Equatable {
 
 class LoadWallet extends WalletEvent {
   final String userId;
-  final bool forceRefresh;
 
-  const LoadWallet(this.userId, {this.forceRefresh = false});
+  const LoadWallet(this.userId);
 
   @override
-  List<Object?> get props => [userId, forceRefresh];
+  List<Object?> get props => [userId];
 }
 
 class DeductBalance extends WalletEvent {
@@ -36,10 +35,9 @@ class DeductBalance extends WalletEvent {
 
 class LoadTransactionHistory extends WalletEvent {
   final String userId;
-  final bool forceRefresh;
 
-  const LoadTransactionHistory(this.userId, {this.forceRefresh = false});
+  const LoadTransactionHistory(this.userId);
 
   @override
-  List<Object?> get props => [userId, forceRefresh];
+  List<Object?> get props => [userId];
 }
