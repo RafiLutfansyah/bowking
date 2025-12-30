@@ -5,6 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/custom_card.dart';
+import '../../../../core/presentation/cubit/current_user_cubit.dart';
 import '../bloc/rewards_bloc.dart';
 import '../bloc/rewards_event.dart';
 import '../bloc/rewards_state.dart';
@@ -37,10 +38,11 @@ class _RewardsPageState extends State<RewardsPage> with SingleTickerProviderStat
     _tabController.addListener(() {
       if (!_tabController.indexIsChanging) {
         // Refresh data when switching tabs
+        final userId = context.read<CurrentUserCubit>().currentUser?.id ?? '';
         if (_tabController.index == 0) {
           context.read<RewardsBloc>().add(LoadAvailableOffers());
         } else {
-          context.read<RewardsBloc>().add(const LoadClaimedOffers());
+          context.read<RewardsBloc>().add(LoadClaimedOffers(userId));
         }
       }
     });
@@ -110,6 +112,7 @@ class _RewardsPageState extends State<RewardsPage> with SingleTickerProviderStat
           current is OfferClaimed || current is OfferClaimFailed,
       listener: (context, state) {
         if (state is OfferClaimed) {
+          final userId = context.read<CurrentUserCubit>().currentUser?.id ?? '';
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Offer claimed successfully!'),
@@ -117,7 +120,7 @@ class _RewardsPageState extends State<RewardsPage> with SingleTickerProviderStat
             ),
           );
           context.read<RewardsBloc>().add(LoadAvailableOffers());
-          context.read<RewardsBloc>().add(const LoadClaimedOffers());
+          context.read<RewardsBloc>().add(LoadClaimedOffers(userId));
         } else if (state is OfferClaimFailed) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -170,13 +173,14 @@ class _RewardsPageState extends State<RewardsPage> with SingleTickerProviderStat
           current is VoucherUsed || current is VoucherUseFailed,
       listener: (context, state) {
         if (state is VoucherUsed) {
+          final userId = context.read<CurrentUserCubit>().currentUser?.id ?? '';
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Voucher berhasil digunakan!'),
               backgroundColor: Colors.green,
             ),
           );
-          context.read<RewardsBloc>().add(const LoadClaimedOffers());
+          context.read<RewardsBloc>().add(LoadClaimedOffers(userId));
         } else if (state is VoucherUseFailed) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -198,7 +202,8 @@ class _RewardsPageState extends State<RewardsPage> with SingleTickerProviderStat
         } else if (state is ClaimedOffersLoaded) {
           return RefreshIndicator(
             onRefresh: () async {
-              context.read<RewardsBloc>().add(const LoadClaimedOffers());
+              final userId = context.read<CurrentUserCubit>().currentUser?.id ?? '';
+              context.read<RewardsBloc>().add(LoadClaimedOffers(userId));
               await Future.delayed(const Duration(milliseconds: 500));
             },
             child: _buildOffersList(
@@ -213,7 +218,8 @@ class _RewardsPageState extends State<RewardsPage> with SingleTickerProviderStat
         } else if (state is VoucherUseFailed) {
           return RefreshIndicator(
             onRefresh: () async {
-              context.read<RewardsBloc>().add(const LoadClaimedOffers());
+              final userId = context.read<CurrentUserCubit>().currentUser?.id ?? '';
+              context.read<RewardsBloc>().add(LoadClaimedOffers(userId));
               await Future.delayed(const Duration(milliseconds: 500));
             },
             child: _buildOffersList(
@@ -425,8 +431,9 @@ class _RewardsPageState extends State<RewardsPage> with SingleTickerProviderStat
   }
 
   void _claimOffer(Offer offer) {
+    final userId = context.read<CurrentUserCubit>().currentUser?.id ?? '';
     context.read<RewardsBloc>().add(ClaimOfferEvent(
-          userId: AppConstants.mockUserId,
+          userId: userId,
           offerId: offer.id,
         ));
   }

@@ -1,5 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../core/constants/app_constants.dart';
 import '../../domain/usecases/get_available_offers.dart';
 import '../../domain/usecases/claim_offer.dart';
 import '../../domain/repositories/rewards_repository.dart';
@@ -40,7 +39,7 @@ class RewardsBloc extends Bloc<RewardsEvent, RewardsState> {
     Emitter<RewardsState> emit,
   ) async {
     emit(RewardsLoading());
-    final result = await rewardsRepository.getClaimedOffers(AppConstants.mockUserId);
+    final result = await rewardsRepository.getClaimedOffers(event.userId);
     result.fold(
       (failure) => emit(RewardsError(message: failure.message)),
       (offers) => emit(ClaimedOffersLoaded(offers)),

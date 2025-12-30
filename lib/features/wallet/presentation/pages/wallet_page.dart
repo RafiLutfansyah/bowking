@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/custom_card.dart';
+import '../../../../core/presentation/cubit/current_user_cubit.dart';
 import '../../domain/entities/wallet_transaction.dart';
 import '../bloc/wallet_bloc.dart';
 import '../bloc/wallet_event.dart';
@@ -36,8 +37,9 @@ class _WalletPageState extends State<WalletPage> with SingleTickerProviderStateM
   }
 
   void _loadInitialData() {
-    context.read<WalletBloc>().add(const LoadWallet(AppConstants.mockUserId));
-    context.read<WalletBloc>().add(const LoadTransactionHistory(AppConstants.mockUserId, forceRefresh: true));
+    final userId = context.read<CurrentUserCubit>().currentUser?.id ?? '';
+    context.read<WalletBloc>().add(LoadWallet(userId));
+    context.read<WalletBloc>().add(LoadTransactionHistory(userId, forceRefresh: true));
   }
 
   @override
@@ -120,7 +122,8 @@ class _WalletPageState extends State<WalletPage> with SingleTickerProviderStateM
           final wallet = state.wallet!;
           return RefreshIndicator(
             onRefresh: () async {
-              context.read<WalletBloc>().add(const LoadWallet(AppConstants.mockUserId));
+              final userId = context.read<CurrentUserCubit>().currentUser?.id ?? '';
+              context.read<WalletBloc>().add(LoadWallet(userId));
               await Future.delayed(const Duration(milliseconds: 500));
             },
             child: ListView(
@@ -213,7 +216,8 @@ class _WalletPageState extends State<WalletPage> with SingleTickerProviderStateM
         } else if (state.transactions != null) {
           return RefreshIndicator(
             onRefresh: () async {
-              context.read<WalletBloc>().add(const LoadTransactionHistory(AppConstants.mockUserId, forceRefresh: true));
+              final userId = context.read<CurrentUserCubit>().currentUser?.id ?? '';
+              context.read<WalletBloc>().add(LoadTransactionHistory(userId, forceRefresh: true));
               await Future.delayed(const Duration(milliseconds: 500));
             },
             child: _buildTransactionsList(state.transactions!),

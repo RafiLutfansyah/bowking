@@ -15,6 +15,7 @@ import '../bloc/booking_state.dart';
 import '../../../../core/domain/payment/payment_method.dart';
 import '../../../../core/presentation/payment/payment_bloc.dart';
 import '../../../../core/presentation/payment/payment_event.dart';
+import '../../../../core/presentation/cubit/current_user_cubit.dart';
 
 class ServicesPage extends StatefulWidget {
   const ServicesPage({super.key});
@@ -43,9 +44,10 @@ class _ServicesPageState extends State<ServicesPage> with SingleTickerProviderSt
   }
 
   void _loadInitialData() {
+    final userId = context.read<CurrentUserCubit>().currentUser?.id ?? '';
     context.read<BookingBloc>().add(LoadServices());
-    context.read<BookingBloc>().add(const LoadUserBookings(AppConstants.mockUserId));
-    context.read<PaymentBloc>().add(const LoadBalance(AppConstants.mockUserId));
+    context.read<BookingBloc>().add(LoadUserBookings(userId));
+    context.read<PaymentBloc>().add(LoadBalance(userId));
   }
 
   @override
@@ -83,8 +85,9 @@ class _ServicesPageState extends State<ServicesPage> with SingleTickerProviderSt
               ),
             );
             // Refresh both tabs
+            final userId = context.read<CurrentUserCubit>().currentUser?.id ?? '';
             context.read<BookingBloc>().add(LoadServices());
-            context.read<BookingBloc>().add(const LoadUserBookings(AppConstants.mockUserId));
+            context.read<BookingBloc>().add(LoadUserBookings(userId));
           }
         },
         child: Column(
@@ -165,7 +168,8 @@ class _ServicesPageState extends State<ServicesPage> with SingleTickerProviderSt
         } else if (state.bookings != null) {
           return RefreshIndicator(
             onRefresh: () async {
-              context.read<BookingBloc>().add(const LoadUserBookings(AppConstants.mockUserId));
+              final userId = context.read<CurrentUserCubit>().currentUser?.id ?? '';
+              context.read<BookingBloc>().add(LoadUserBookings(userId));
               await Future.delayed(const Duration(milliseconds: 500));
             },
             child: _buildBookingsList(state.bookings!),
@@ -592,6 +596,7 @@ class _ServicesPageState extends State<ServicesPage> with SingleTickerProviderSt
     if (paymentState.balance == null) return;
 
     final balance = paymentState.balance!;
+    final userId = context.read<CurrentUserCubit>().currentUser?.id ?? '';
     double payRM = 0;
     double payTokens = 0;
 
@@ -602,7 +607,7 @@ class _ServicesPageState extends State<ServicesPage> with SingleTickerProviderSt
     }
 
     context.read<PaymentBloc>().add(ProcessPayment(
-          userId: AppConstants.mockUserId,
+          userId: userId,
           paymentMethod: PaymentMethod(
             amountRM: payRM,
             amountTokens: payTokens,
@@ -611,7 +616,7 @@ class _ServicesPageState extends State<ServicesPage> with SingleTickerProviderSt
         ));
 
     context.read<BookingBloc>().add(CreateBookingEvent(
-          userId: AppConstants.mockUserId,
+          userId: userId,
           service: service,
           dateTime: dateTime,
           amountPaidRM: payRM,

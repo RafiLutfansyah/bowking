@@ -10,10 +10,12 @@ abstract class RewardsEvent extends Equatable {
 class LoadAvailableOffers extends RewardsEvent {}
 
 class LoadClaimedOffers extends RewardsEvent {
-  const LoadClaimedOffers();
+  final String userId;
+
+  const LoadClaimedOffers(this.userId);
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [userId];
 }
 
 class ClaimOfferEvent extends RewardsEvent {
